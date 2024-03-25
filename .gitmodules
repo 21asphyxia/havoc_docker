@@ -1,0 +1,6 @@
+[submodule "havoc"]
+	path = havoc
+	url = https://github.com/21asphyxia/havoc.git
+[submodule "havoc_fe"]
+	path = havoc_fe
+	url = https://github.com/21asphyxia/havoc_fe.git

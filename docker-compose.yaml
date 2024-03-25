@@ -1,0 +1,46 @@
+version: "2"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: havoc
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  frontend:
+    container_name: havoc_fe
+    build:
+      context: ./havoc_fe
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+  backend:
+    container_name: havoc_be
+    build:
+      context: ./havoc
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/havoc
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+volumes:
+  postgres:
+    driver: local
